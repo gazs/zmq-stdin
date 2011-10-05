@@ -1,0 +1,11 @@
+#!/usr/bin/env coffee
+# vim: syntax=coffee
+zmq = require 'zmq'
+[_, _, type, address, _...] = process.argv
+if type not in supported = ["req", "push", "pub"]
+  console.error "this is a tap. only types #{supported} are supported"
+  process.exit(1)
+socket = zmq.createSocket(type)
+socket.connect(address)
+process.openStdin().on 'data', (data) -> socket.send data.toString 'utf-8'
+socket.on 'message', (data)-> console.log data.toString 'utf-8'

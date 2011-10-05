@@ -1,0 +1,13 @@
+#!/usr/bin/env coffee
+# vim: syntax=coffee 
+zmq = require 'zmq'
+[_, _, type, address, subscription, _...] = process.argv
+if type not in supported = ["rep", "pull", "sub"]
+  console.error "this is a sink. only types #{supported} are supported"
+  process.exit(1)
+socket = zmq.createSocket(type)
+socket.subscribe(subscription) if type is "sub"
+socket.bind address, (err) ->
+  throw err if err
+  socket.on "message", (data) ->
+    console.log data.toString "utf-8"
